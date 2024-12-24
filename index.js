@@ -35,6 +35,11 @@ async function run() {
         const books = await cursor.toArray();
         res.send(books);
     });
+    app.get('/book', async (req, res) => {
+        const cursor = booksCollection.find({}).limit(4);
+        const books = await cursor.toArray();
+        res.send(books);
+    });
 
     app.get('/books/:id', async (req, res) => {
         const id = req.params.id;
