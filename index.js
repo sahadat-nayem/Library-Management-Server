@@ -48,6 +48,12 @@ async function run() {
         res.send(result);
     });
 
+    app.post('/book', async (req, res) => {
+      const newBook = req.body;
+      const result = await booksCollection.insertOne(newBook);
+      res.json(result);
+    });
+
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
