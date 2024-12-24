@@ -54,6 +54,20 @@ async function run() {
       res.json(result);
     });
 
+    app.put('/books/:id', async(req,res) =>{
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)}
+      const options = { upsert: true };
+      const updateBook = req.body;
+      const book = {
+        $set: {
+          Name: updateBook.Name, AuthorName: updateBook.AuthorName, Category: updateBook.Category, Rating: updateBook.Rating, BookImage: updateBook.BookImage
+        },
+      };
+      const result = await booksCollection.updateOne(filter, book, options)
+      res.send(result);
+    })
+
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
