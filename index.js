@@ -28,6 +28,8 @@ async function run() {
 
     // Books related APIs
     const booksCollection = client.db('libraryManagement').collection('books');
+    const userCollection = client.db('libraryManagement').collection('users');
+    const borrowCollection = client.db('libraryManagement').collection('borrow');
     // const bookApplicationCollection = client.db('jobPortal').collection('job_applications');
 
     app.get('/books', async (req, res) => {
@@ -54,7 +56,9 @@ async function run() {
       res.json(result);
     });
 
-    app.put('/books/:id', async(req,res) =>{
+    // users related apis
+
+    app.put('/users/:id', async(req,res) =>{
       const id = req.params.id;
       const filter = {_id: new ObjectId(id)}
       const options = { upsert: true };
@@ -64,9 +68,23 @@ async function run() {
           Name: updateBook.Name, AuthorName: updateBook.AuthorName, Category: updateBook.Category, Rating: updateBook.Rating, BookImage: updateBook.BookImage
         },
       };
-      const result = await booksCollection.updateOne(filter, book, options)
+      const result = await userCollection.updateOne(filter, book, options)
       res.send(result);
     })
+
+    // borrow related apis
+
+    app.get('/borrow', async (req, res) => {
+      const cursor = borrowCollection.find({});
+      const result = await cursor.toArray();
+      res.send(result);
+  });
+
+    app.post('/borrow', async (req, res) => {
+      const borrowBook = req.body;
+      const result = await borrowCollection.insertOne(borrowBook);
+      res.json(result);
+    });
 
   } finally {
     // Ensures that the client will close when you finish/error
