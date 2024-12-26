@@ -86,6 +86,13 @@ async function run() {
       res.json(result);
     });
 
+    app.delete('/borrow/:id', async(req, res) =>{
+        const id = req.params.id;
+        const query ={_id: new ObjectId(id)}
+        const result = await borrowCollection.deleteOne(query);
+        res.send(result);
+      })
+
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
