@@ -28,17 +28,17 @@ async function run() {
 
     // Books related APIs
     const booksCollection = client.db('libraryManagement').collection('books');
-    const userCollection = client.db('libraryManagement').collection('users');
+    // const userCollection = client.db('libraryManagement').collection('users');
     const borrowCollection = client.db('libraryManagement').collection('borrow');
     // const bookApplicationCollection = client.db('jobPortal').collection('job_applications');
 
-    app.get('/books', async (req, res) => {
-        const cursor = booksCollection.find({});
+    app.get('/book', async (req, res) => {
+        const cursor = booksCollection.find();
         const books = await cursor.toArray();
         res.send(books);
     });
-    app.get('/book', async (req, res) => {
-        const cursor = booksCollection.find({}).limit(4);
+    app.get('/book/two', async (req, res) => {
+        const cursor = booksCollection.find().limit(4);
         const books = await cursor.toArray();
         res.send(books);
     });
@@ -56,29 +56,47 @@ async function run() {
       res.json(result);
     });
 
-    // users related apis
-
-    app.put('/users/:id', async(req,res) =>{
+    //!---------------- users related apis----------------------------------------
+ 
+    app.put('/book/:id', async(req,res) =>{
+      console.log("Request Received:", req.params.id, req.body);
       const id = req.params.id;
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).send({ message: "Invalid ID format" });
+      }
       const filter = {_id: new ObjectId(id)}
+      console.log("Filter Query:", filter);
       const options = { upsert: true };
       const updateBook = req.body;
       const book = {
         $set: {
-          Name: updateBook.Name, AuthorName: updateBook.AuthorName, Category: updateBook.Category, Rating: updateBook.Rating, BookImage: updateBook.BookImage
+          name: updateBook.name, authorName: updateBook.authorName, category: updateBook.category, rating: updateBook.rating, photo : updateBook.photo 
         },
       };
-      const result = await userCollection.updateOne(filter, book, options)
-      res.send(result);
+      try {
+        const result = await booksCollection.updateOne(filter, book, options)
+        res.send(result);
+      } catch (error) {
+          console.error("Update Error:", error);
+          res.status(500).send({ message: "Internal Server Error" });
+      }
     })
 
-    // borrow related apis
+    // borrow related apisname
 
     app.get('/borrow', async (req, res) => {
       const cursor = borrowCollection.find({});
       const result = await cursor.toArray();
       res.send(result);
   });
+
+    app.get("/borrow", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const cursor = borrowCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
     app.post('/borrow', async (req, res) => {
       const borrowBook = req.body;
