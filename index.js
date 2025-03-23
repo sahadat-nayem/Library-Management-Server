@@ -32,8 +32,8 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
-    console.log("✅ Connected to MongoDB");
+    // await client.connect();
+    // console.log("✅ Connected to MongoDB");
 
     // Collections
     const booksCollection = client.db("libraryManagement").collection("books");
